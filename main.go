@@ -33,7 +33,7 @@ var mainMenu = []string{
 	"5. Delete Item",
 	"6. Print Current Data",
 	"7. Add New Category Name",
-	"0. Exit Program",
+	"8. Exit Program",
 }
 
 var ReportMenu = []string{
@@ -98,6 +98,7 @@ func main() {
 		time.Sleep(3 * time.Second)
 		displayMainMenu()
 		fmt.Scanln(&input1)
+		break
 	}
 
 	for validSelection(option1, input1) {
@@ -166,35 +167,104 @@ func main() {
 				}
 			}
 		case 3:
-			var input30, input31 string
-			var input32 int
-			var input33 float64
+			var itemName, itemCat string
+			var itemQuantity int
+			var itemCost float64
 			fmt.Println("Enter name of item you wish to add?")
-			fmt.Scanln(&input30)
+			fmt.Scanln(&itemName)
 			fmt.Println("What category does it belong to?")
-			fmt.Scanln(&input31)
+			fmt.Scanln(&itemCat)
 			fmt.Println("How many units would you like to add?")
-			fmt.Scanln(&input32)
+			fmt.Scanln(&itemQuantity)
 			fmt.Println("How much does it cost per unit?")
-			fmt.Scanln(&input33)
+			fmt.Scanln(&itemCost)
 
-			a, foundCategory := findCategory(categorys, input31)
-			if !foundCategory && a == -1 {
+			index, foundCategory := findCategory(categorys, itemCat)
+			if !foundCategory && index == -1 {
 				fmt.Println("Category not found. Please create new category.")
-			}
-		case 4:
-			var input40, input41 string
-			var input42 int
-			var input43 float64
-			fmt.Println("Modify Items.")
-			fmt.Println("Which item would you like to modify?")
-			fmt.Scanln(&input40)
-			for key, _ := range items {
-				if input40 == key {
-					fmt.Println("Current item name is " + input40 + " - Category is " + categorys[value.Category] + " Quantity is " + strconv.Itoa(value.Quantity) + " Unit Cost " + fmt.Sprintf("%g", value.Unit_Cost))
-					fmt.Scanln(input41, input42, input43)
+			} else if foundCategory && index == 0 {
+				for key, value := range items {
+					if key == itemName {
+						fmt.Printf("Item %v, would you like to change the Quantity to %v and Unit Cost to %v?", value, value.Quantity, value.Unit_Cost)
+
+					}
 				}
 			}
+		case 4:
+			var modItem, modCat string
+			var modQuantity int
+			var modPrice float64
+			fmt.Println("\nModify Items.")
+			fmt.Println("Which item would you like to modify?")
+			fmt.Scanln(&modItem)
+			for key, value := range items {
+				if modItem != key {
+					fmt.Println("Sorry item not found. Please add new item before modifying.")
+					break
+				} else {
+					if modItem == key {
+						fmt.Printf("Current item name is %v - Category is %v - Quantity is %v - Unit Cost is %g", modItem, categorys[value.Category], strconv.Itoa(value.Quantity), value.Unit_Cost)
+						fmt.Scanln(&modCat)
+						fmt.Println("Enter new Quantity. Press enter for no change.")
+						fmt.Scanln(&modQuantity)
+						fmt.Println("Enter new Unit Cost. Press enter for no change.")
+						fmt.Scanln(&modPrice)
+						//Havent add the comments afer modifying
+					}
+				}
+			}
+		case 5:
+			var deleteItem string
+			fmt.Println("\nDelete Item")
+			fmt.Printf("Enter item to delete: ")
+			fmt.Scanln(&deleteItem)
+			for key, _ := range items {
+				if key != deleteItem {
+					fmt.Println("\nItem not found. Nothing to delete.")
+				} else {
+					delete(items, key)
+					fmt.Printf("Deleted %s", deleteItem)
+					break
+					//not working try again
+				}
+				input1 = -1
+				fmt.Println("\nPress enter to exit program")
+				fmt.Scanln()
+			}
+		case 6:
+			fmt.Println("\nPrint Current Data")
+			if len(items) != 0 {
+				for key, value := range items {
+					fmt.Println(key + "{" + strconv.Itoa(value.Category) + " " + strconv.Itoa(value.Quantity) + " " + fmt.Sprintf("%g", value.Unit_Cost) + "}")
+				}
+			} else {
+				fmt.Println("No data found.")
+			}
+			input1 = -1
+			fmt.Println("\nPress enter to exit program")
+			fmt.Scanln()
+
+		case 7:
+			var newCat string
+			fmt.Println("Add New Category Name")
+			fmt.Println("What is the New Category Name to add?")
+			fmt.Scanln(&newCat)
+			_, newName := findCategory(categorys, newCat)
+			if newName == false {
+				categorys = append(categorys, newCat)
+				fmt.Printf("New Category: %v "+"added at index "+strconv.Itoa(len(categorys)), newCat)
+			} else if newName == true {
+				fmt.Printf("Category: %v already found at index "+strconv.Itoa(len(categorys)), newCat)
+			} else {
+				fmt.Println("No input found")
+				break
+			}
+			input1 = -1
+		case 8:
+			fmt.Println("Exiting Program. Hope to see you again.")
+			return
 		}
+		displayMainMenu()
+		fmt.Scanln(&input1)
 	}
 }
