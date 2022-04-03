@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"sort"
 	"strconv"
 	"time"
 )
@@ -14,6 +13,8 @@ type product struct {
 }
 
 var items map[string]product
+
+var categorys = []string{"Household", "Food", "Drinks"}
 
 func init() {
 	items = make(map[string]product)
@@ -89,7 +90,6 @@ func main() {
 
 	var input1 int
 	option1 := makeMenuRange(1, len(mainMenu))
-	categorys := []string{"Household", "Food", "Drinks"}
 
 	displayMainMenu()
 	fmt.Scanln(&input1)
@@ -147,36 +147,22 @@ func main() {
 					genReportMenu()
 					fmt.Scanln(&input2)
 				} else if input2 == 2 {
-					fmt.Println("List by Category")
-					keys := make([]string, 0, len(items))
-					for k := range items {
-						keys = append(keys, k)
-					}
-					sort.Strings(keys)
-
-					for _, k := range keys {
-						fmt.Println(k, items[k])
+					for index, valueOut := range categorys {
+						for key, valueIn := range items {
+							if index == int(valueIn.Category) {
+								fmt.Printf("Category: %v - Item: %v  Quantity: %v  Unit Cost: %g\n", valueOut, key, valueIn.Quantity, valueIn.Unit_Cost)
+							}
+						}
 					}
 					break
-					/*for key, value := range items {
-						for k := range categorys {
-							if value.Category == k {
-								fmt.Printf("%v: - Item: %v, Quantity: %v Unit Cost: %g\n", categorys[value.Category], key, value.Quantity, value.Unit_Cost)
-								//fmt.Println(categorys[value.Category] + ": " + key + " - Item: " + strconv.Itoa(value.Quantity) + " Unit Cost: " + fmt.Sprintf("%g", value.Unit_Cost))
-							}
-							fmt.Println("")
-							input1 = -1
-							fmt.Println("Press enter to go back")
-							fmt.Scanln()
-							genReportMenu()
-							fmt.Scanln(&input2)
-						}
-					}*/
 				} else if input2 == 3 {
 					displayMainMenu()
 					fmt.Scanln(&input1)
 				}
 			}
+			input1 = -1
+			fmt.Println("\nPress enter to return to main menu.")
+			fmt.Scanln()
 
 		case 3:
 			var itemName, itemCat string
@@ -204,7 +190,7 @@ func main() {
 			}
 
 		case 4:
-			var modItem, modItem2, modCat string
+			var modItem, newName, modCat string
 			var modQuantity int
 			var modPrice float64
 			fmt.Println("\nModify Items.")
@@ -213,24 +199,36 @@ func main() {
 			for key, value := range items {
 				if key == modItem {
 					fmt.Printf("Current item name is %v - Category is %v - Quantity is %v - Unit Cost is %g\n", modItem, categorys[value.Category], strconv.Itoa(value.Quantity), value.Unit_Cost)
-					fmt.Println("Enter new name. Press enter if there are no changes.")
-					fmt.Scanln(&modItem2)
+					fmt.Println("\nEnter new name. Press enter if there are no changes.")
+					fmt.Scanln(&newName)
 					fmt.Println("Enter new Category. Press enter if there are no changes")
 					fmt.Scanln(&modCat)
 					fmt.Println("Enter new Quantity. Press enter if there are no changes.")
 					fmt.Scanln(&modQuantity)
 					fmt.Println("Enter new Unit Cost. Press enter if there are no changes.")
 					fmt.Scanln(&modPrice)
-					//Havent add comments after modification, still not working
-				} else {
-					fmt.Println("Sorry item not found. Please add new item before modifying.")
-					break
+
+					if newName == "" {
+						fmt.Println("No changes made to item Name.")
+					}
+
+					if modCat == "" {
+						fmt.Println("No changes made to Item Category")
+					}
+
+					if modQuantity == 0 {
+						fmt.Println("No changes made to item Quantity")
+					}
+
+					if modPrice == 0.0 {
+						fmt.Println("No changes made to item Unit Cost")
+					}
 				}
 			}
 			input1 = -1
 			fmt.Println("\nPress enter to return to main menu.")
 			fmt.Scanln()
-
+			//done
 		case 5:
 			var deleteItem string
 			fmt.Println("\nDelete Item")
@@ -273,10 +271,6 @@ func main() {
 				fmt.Printf("New Category: %v added at index %v", newCat, strconv.Itoa(len(categorys)))
 			} else if newName == true {
 				fmt.Printf("Category: %v already found at index %v", newCat, strconv.Itoa(key))
-			} else {
-				fmt.Println("No input found")
-				break
-				//havent handle error
 			}
 			input1 = -1
 			fmt.Println("\nPress enter to return to main menu")
